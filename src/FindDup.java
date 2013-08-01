@@ -55,7 +55,6 @@ public class FindDup {
 		    Dir directory = new Dir(obj);
 		    
 		    System.out.println(directory.getLoc() + " " + directory.getFileSize());
-		    System.out.println(directory.findFileByMD5("be203b22e52f699fc8677d2e0ffbd432"));
 		    
 		    IndFile f = null;
 		    
@@ -64,7 +63,6 @@ public class FindDup {
 		    	String fn = new String(directory.getLoc() + "\\" + f.getFilename());
 		    	iniForsensic.put(directory.getLoc(),f.getFilename(),f.getMD5() + "," + f.getSize());   	
 		    }
-//		    directory.Print(true);
 		}
 		if (options.has("w")) {
 			iniForsensic.store();
@@ -81,14 +79,33 @@ public class FindDup {
 	
 	// go through the ini class to find duplicate MD5 records
 	private static void findDuplicate(Ini iniForsensic) {
-    	for (String sectionName: iniForsensic.keySet()) {
+	
+		 ArrayList<Dir> alDirectory = new ArrayList<Dir>(0);
+		 for (String sectionName: iniForsensic.keySet()) {
+	    		Ini.Section section = iniForsensic.get(sectionName);
+	    		Dir directory = new Dir (sectionName,section);
+	    		alDirectory.add(directory);
+		 }
+
+		for (String sectionName: iniForsensic.keySet()) {
     		System.out.println("Checking Section ["+sectionName+"]");
     		
     		Ini.Section section = iniForsensic.get(sectionName);
+	  		
     		for (String optionKey: section.keySet()) {
     			String val = section.get(optionKey);
     			String[] element = val.split(",");
     			System.out.println("\t"+optionKey+"="+element[0] + " " + element[1]);
+
+    			Iterator<Dir> it = alDirectory.iterator();
+    			Dir compDir = null;
+    			while(it.hasNext())	{
+    			    Dir obj = it.next();
+    			    String foundFile = obj.findFileByMD5(element[0]);
+    			    if (foundFile != null) {
+    			    	System.out.println("\t\t" + foundFile);
+        			}
+    			}
     		} 		
     	}
 	}

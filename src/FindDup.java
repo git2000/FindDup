@@ -31,7 +31,7 @@ public class FindDup {
 		options = checkOptions(args);
 
 		File file = null;
-		
+	
 		Properties propConfig = new Properties();
 		try {
 			propConfig.load(new FileInputStream("config.txt"));
@@ -55,6 +55,7 @@ public class FindDup {
 		    Dir directory = new Dir(obj);
 		    
 		    System.out.println(directory.getLoc() + " " + directory.getFileSize());
+		    System.out.println(directory.findFileByMD5("be203b22e52f699fc8677d2e0ffbd432"));
 		    
 		    IndFile f = null;
 		    
@@ -71,6 +72,25 @@ public class FindDup {
 		if (options.has("v")) {
 			verifyForensic(propConfig.getProperty("forensic"));
 		}
+		
+		if (options.has("d")) {
+			findDuplicate(iniForsensic);
+		}
+
+	}
+	
+	// go through the ini class to find duplicate MD5 records
+	private static void findDuplicate(Ini iniForsensic) {
+    	for (String sectionName: iniForsensic.keySet()) {
+    		System.out.println("Checking Section ["+sectionName+"]");
+    		
+    		Ini.Section section = iniForsensic.get(sectionName);
+    		for (String optionKey: section.keySet()) {
+    			String val = section.get(optionKey);
+    			String[] element = val.split(",");
+    			System.out.println("\t"+optionKey+"="+element[0] + " " + element[1]);
+    		} 		
+    	}
 	}
 	
 	private static void verifyForensic(String fn) throws IOException{

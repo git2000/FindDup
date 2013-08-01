@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import com.google.common.hash.HashCode;
@@ -11,6 +12,7 @@ import com.google.common.io.Files;
 public class Dir {
 	private String loc;
 	private ArrayList<IndFile> fileList = new ArrayList<IndFile>();
+	private HashMap hmMD5ToFileName = new HashMap();
 
 	public Dir () {
 		loc = ".";	
@@ -82,8 +84,14 @@ public class Dir {
 				}
 				IndFile f = new IndFile(files,md5Hex,l);
 				fileList.add(f);
+				hmMD5ToFileName.put(md5Hex, f.getFilename());
 			}
 		}
 
+	}
+	public String findFileByMD5(String md5) {
+		String filename = "";
+		filename = (String)hmMD5ToFileName.get(md5);
+		return filename;
 	}
 }
